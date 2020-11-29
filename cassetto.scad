@@ -12,7 +12,7 @@ length_mid_offset = length_max - length_mid;
 width = 235;
 handle_side_min = 50;
 handle_side_max = 60;
-depth = 75;
+depth = 70;
 fix = 0.01;
 gap = 0.6;
 
@@ -73,7 +73,7 @@ p3 = [handle_side_max,length_min_offset];
 
 
 module smooth() {
-    linear_extrude(height=depth+fix*3)
+    linear_extrude(height=depth+10+fix*3)
     polygon(concat(
         cubic_bezier(
             [0,length_mid_offset+1],
@@ -131,15 +131,14 @@ module cassetto() {
 box_length = 50;
 box_width = 50;
 box_depth = 50;
-box_bottom_thick = 3;
-box_wall_thick = 3;
-
+box_bottom_thick = 1.6;
+box_wall_thick = 1.6;
 
 box_hang_label_width = 30;
 box_hang_label_length = 10;
 box_hang_label_margin = 2;
 box_hang_play = 0.3;
-box_hang_eps = 0.7;
+box_hang_eps = 1.5;
 box_hang_width = box_hang_label_width+box_hang_label_margin*2-box_hang_eps*2+box_hang_play*2;
 box_hang_length = box_hang_label_length+box_hang_label_margin-box_hang_eps+box_hang_play*2;
 box_hang_thick = 2;
@@ -187,7 +186,7 @@ module box_hang() {
 module box_main(box_width, box_length, box_depth) {
     difference() {
         cube([box_width, box_length, box_depth]);
-            
+
         translate([box_wall_thick,box_wall_thick,box_bottom_thick])
         cube([box_width-box_wall_thick*2, box_length-box_wall_thick*2, box_depth]);
     };
@@ -196,15 +195,17 @@ module box_main(box_width, box_length, box_depth) {
 module box_main_outer(box_width, box_length, box_depth) {
     module solid() {
         intersection() {
+            translate([gap,-gap,0])
             cube([box_width, box_length, box_depth]);
-            reduce_y(gap)
+            reduce(gap)
             smooth();
         }
     }
     
+    translate([-gap,gap,0])
     difference() {
         solid();
-        
+
         translate([0,0,box_bottom_thick])
         reduce(box_wall_thick)
         solid();    
@@ -235,8 +236,32 @@ module box(box_width, box_length, box_depth) {
     }
 }
 
+module box_outer(box_width, box_length, box_depth) {
+    module move_hang() {
+        translate([
+            (box_width-box_hang_width)/2,
+            box_length-box_hang_length,
+            box_depth
+        ])
+        children();
+    }
+
+    
+    difference() {
+        union() {
+            box_main_outer(box_width, box_length, box_depth);
+            move_hang()
+            box_hang_solid();
+        };
+        move_hang()
+        box_hang_void();
+    }
+}
+
 box_width_25 = (width-gap*5)/4;
 box_length_20 = (length_max-gap*6)/5;
+
+box_length_20_bc = length_min-gap*6-box_length_20*4 - gap;
 
 module box_grid() {
     
@@ -249,19 +274,53 @@ module box_grid() {
             box(box_width_25, box_length_20, depth);
         }
     }
-    x_shift = gap+(box_width_25+gap)*0;
-    y_shift = gap+(box_length_20+gap)*4;
-    color("red")
-    translate([x_shift, length_max-box_length_20-y_shift,0])
-    box_main_outer(box_width_25, box_length_20, depth);
+    x1_shift = gap+(box_width_25+gap)*0;
+    y1_shift = gap+(box_length_20+gap)*4;
+    
+    translate([x1_shift, length_max-box_length_20-y1_shift,0])
+    box_outer(box_width_25, box_length_20, depth);
+    
+    x2_shift = gap+(box_width_25+gap)*3;
+    y2_shift = gap+(box_length_20+gap)*4;
+    
+    translate([box_width_25+x2_shift, length_max-box_length_20-y2_shift,0])
+    mirror([1,0,0])
+    box_outer(box_width_25, box_length_20, depth);
+    
+    x3_shift = gap+(box_width_25+gap)*1;
+    y3_shift = gap+(box_length_20+gap)*4;
+    
+    translate([x3_shift, length_max-box_length_20_bc-y3_shift,0])
+    box(box_width_25, box_length_20_bc, depth);
+    
+    x4_shift = gap+(box_width_25+gap)*2;
+    y4_shift = gap+(box_length_20+gap)*4;
+    
+    translate([x4_shift, length_max-box_length_20_bc-y4_shift,0])
+    box(box_width_25, box_length_20_bc, depth);
+    
 }
 
 
 
-translate([0,0,0.5])
-box_grid();
+//translate([0,0,0.5])
+//box_grid();
 
-cassetto();
+//cassetto();
+
+module box_test() {
+    difference() {
+        box(45,40,7);
+        translate([-10,-2,-5])
+        cube([70,30,30]);   
+       translate([0,0,-130]) 
+        cube([70,130,130]);    
+    }
+}
+
+box_test();
+//box(box_width_25, box_length_20, depth);
+//box_outer(box_width_25, box_length_20, depth);
 
 //box_main_outer(box_width_25, box_length_20, depth);
 
