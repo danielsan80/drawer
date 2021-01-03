@@ -12,7 +12,7 @@ length_mid_offset = length_max - length_mid;
 width = 235;
 handle_side_min = 50;
 handle_side_max = 60;
-depth = 70;
+depth = 45;
 fix = 0.01;
 gap = 0.6;
 
@@ -159,6 +159,32 @@ module box_hang_solid() {
     }
 }
 
+module box_hang_firm() {
+    hull() {
+        translate([
+            0,
+            box_hang_length-fix,
+            -box_hang_eps/2        
+        ])
+        cube([
+            box_hang_width,
+            fix,
+            fix    
+        ]);
+        
+        translate([
+            0,
+            box_hang_length-box_hang_eps/2,
+            -box_hang_eps    
+        ])
+        cube([
+            box_hang_width,
+            box_hang_eps/2,
+            fix    
+        ]);
+    }
+}
+
 module box_hang_void() {
     hull() {
         translate([box_hang_label_margin, +box_hang_label_margin,fix])
@@ -176,11 +202,14 @@ module box_hang_void() {
     }
 }
 
+
+
 module box_hang() {
     difference() {
         box_hang_solid();
         box_hang_void();
     }
+    box_hang_firm();
 }
 
 module box_main(box_width, box_length, box_depth) {
@@ -256,6 +285,8 @@ module box_outer(box_width, box_length, box_depth) {
         move_hang()
         box_hang_void();
     }
+    move_hang()
+    box_hang_firm();
 }
 
 box_width_25 = (width-gap*5)/4;
@@ -318,11 +349,17 @@ module box_test() {
     }
 }
 
-box_test();
+//box_test();
 //box(box_width_25, box_length_20, depth);
-//box_outer(box_width_25, box_length_20, depth);
+box_outer(box_width_25, box_length_20, depth);
 
 //box_main_outer(box_width_25, box_length_20, depth);
+
+//intersection() {    
+//    box_hang();
+//    translate([0,0,-2])
+//    cube([100,100,3]);
+//}
 
 
 
