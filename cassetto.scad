@@ -12,7 +12,7 @@ length_mid_offset = length_max - length_mid;
 width = 235;
 handle_side_min = 50;
 handle_side_max = 60;
-depth = 45;
+depth = 45; 
 fix = 0.01;
 gap = 0.6;
 
@@ -350,8 +350,10 @@ module box_test() {
 }
 
 //box_test();
+
 //box(box_width_25, box_length_20, depth);
-box_outer(box_width_25, box_length_20, depth);
+//box_outer(box_width_25, box_length_20, depth);
+box(box_width_25, box_length_20_bc, depth);
 
 //box_main_outer(box_width_25, box_length_20, depth);
 
