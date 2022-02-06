@@ -162,24 +162,24 @@ module box_hang_solid() {
 module box_hang_firm() {
     hull() {
         translate([
-            0,
+            box_hang_eps*3,
             box_hang_length-fix,
-            -box_hang_eps/2        
+            0        
         ])
         cube([
-            box_hang_width,
+            box_hang_width-box_hang_eps*6,
             fix,
             fix    
         ]);
         
         translate([
-            0,
-            box_hang_length-box_hang_eps/2,
+            box_hang_eps*2,
+            box_hang_length-box_hang_eps,
             -box_hang_eps    
         ])
         cube([
-            box_hang_width,
-            box_hang_eps/2,
+            box_hang_width-box_hang_eps*4,
+            box_hang_eps,
             fix    
         ]);
     }
@@ -263,6 +263,8 @@ module box(box_width, box_length, box_depth) {
         move_hang()
         box_hang_void();
     }
+    move_hang()
+    box_hang_firm();
 }
 
 module box_outer(box_width, box_length, box_depth) {
